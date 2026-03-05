@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cyber">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlockBound SMP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       THEME DEFINITIONS
+    ============================================================ */
+
+    /* CYBER BLUE (default) */
+    [data-theme="cyber"] {
+      --bg:       #050810;
+      --bg2:      #080d1a;
+      --surface:  #0d1528;
+      --border:   #1a2540;
+      --accent:   #00d4ff;
+      --accent2:  #7c3aed;
+      --accent3:  #22c55e;
+      --gold:     #f59e0b;
+      --text:     #c8d6f0;
+      --text-dim: #5a7090;
+      --glow:     rgba(0,212,255,0.18);
+      --glow2:    rgba(124,58,237,0.22);
+      --grid-color: rgba(0,212,255,0.03);
+      --orb1: rgba(124,58,237,0.08);
+      --orb2: rgba(0,212,255,0.06);
+      --nav-bg: rgba(5,8,16,0.88);
+      --hero-gradient: linear-gradient(135deg, #00d4ff, #7c3aed);
+      --bar-gradient: linear-gradient(90deg, #00d4ff, #7c3aed);
+    }
+
+    /* NETHER — deep red/orange lava */
+    [data-theme="nether"] {
+      --bg:       #0e0505;
+      --bg2:      #180808;
+      --surface:  #1f0c0c;
+      --border:   #3d1414;
+      --accent:   #ff4d1c;
+      --accent2:  #ff9000;
+      --accent3:  #ffd700;
+      --gold:     #ffd700;
+      --text:     #f0cfc8;
+      --text-dim: #8a5050;
+      --glow:     rgba(255,77,28,0.2);
+      --glow2:    rgba(255,144,0,0.2);
+      --grid-color: rgba(255,77,28,0.03);
+      --orb1: rgba(255,77,28,0.1);
+      --orb2: rgba(255,144,0,0.07);
+      --nav-bg: rgba(14,5,5,0.9);
+      --hero-gradient: linear-gradient(135deg, #ff4d1c, #ff9000);
+      --bar-gradient: linear-gradient(90deg, #ff4d1c, #ffd700);
+    }
+
+    /* EMERALD — deep forest green */
+    [data-theme="emerald"] {
+      --bg:       #030e06;
+      --bg2:      #071408;
+      --surface:  #0a1e0d;
+      --border:   #153520;
+      --accent:   #00ff88;
+      --accent2:  #00c853;
+      --accent3:  #69ff47;
+      --gold:     #aaff00;
+      --text:     #c8f0d4;
+      --text-dim: #3d7050;
+      --glow:     rgba(0,255,136,0.18);
+      --glow2:    rgba(0,200,83,0.2);
+      --grid-color: rgba(0,255,136,0.03);
+      --orb1: rgba(0,200,83,0.08);
+      --orb2: rgba(0,255,136,0.06);
+      --nav-bg: rgba(3,14,6,0.9);
+      --hero-gradient: linear-gradient(135deg, #00ff88, #00c853);
+      --bar-gradient: linear-gradient(90deg, #00ff88, #aaff00);
+    }
+
+    /* VOID — deep purple/pink cosmic */
+    [data-theme="void"] {
+      --bg:       #08050f;
+      --bg2:      #0f0818;
+      --surface:  #140c22;
+      --border:   #281845;
+      --accent:   #d946ef;
+      --accent2:  #a855f7;
+      --accent3:  #f0abfc;
+      --gold:     #e879f9;
+      --text:     #e8d0f4;
+      --text-dim: #6b4a80;
+      --glow:     rgba(217,70,239,0.2);
+      --glow2:    rgba(168,85,247,0.22);
+      --grid-color: rgba(217,70,239,0.03);
+      --orb1: rgba(168,85,247,0.1);
+      --orb2: rgba(217,70,239,0.07);
+      --nav-bg: rgba(8,5,15,0.9);
+      --hero-gradient: linear-gradient(135deg, #d946ef, #a855f7);
+      --bar-gradient: linear-gradient(90deg, #d946ef, #f0abfc);
+    }
+
+    /* ICE — arctic white/teal */
+    [data-theme="ice"] {
+      --bg:       #060d14;
+      --bg2:      #0a1520;
+      --surface:  #0e1e2e;
+      --border:   #1a3348;
+      --accent:   #7fdbff;
+      --accent2:  #38bdf8;
+      --accent3:  #bae6fd;
+      --gold:     #e0f2fe;
+      --text:     #daf0ff;
+      --text-dim: #4a7a99;
+      --glow:     rgba(127,219,255,0.18);
+      --glow2:    rgba(56,189,248,0.2);
+      --grid-color: rgba(127,219,255,0.04);
+      --orb1: rgba(56,189,248,0.08);
+      --orb2: rgba(127,219,255,0.06);
+      --nav-bg: rgba(6,13,20,0.9);
+      --hero-gradient: linear-gradient(135deg, #7fdbff, #38bdf8);
+      --bar-gradient: linear-gradient(90deg, #7fdbff, #bae6fd);
+    }
+
+    /* ============================================================
+       BASE STYLES
+    ============================================================ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 400;
+      overflow-x: hidden;
+      cursor: crosshair;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    /* ANIMATED GRID */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none; z-index: 0;
+      transition: background 0.5s;
+    }
+
+    /* AMBIENT ORBS */
+    body::after {
+      content: '';
+      position: fixed; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 25% 25%, var(--orb1) 0%, transparent 50%),
+                  radial-gradient(ellipse at 75% 75%, var(--orb2) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+      animation: bgDrift 25s ease-in-out infinite alternate;
+      transition: background 0.5s;
+    }
+
+    @keyframes bgDrift {
+      0%   { transform: translate(0,0) rotate(0deg); }
+      100% { transform: translate(3%,3%) rotate(2deg); }
+    }
+
+    /* SCANLINE OVERLAY for epic feel */
+    .scanlines {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+    }
+
+    /* ============================================================
+       NAV
+    ============================================================ */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: var(--nav-bg);
+      backdrop-filter: blur(24px) saturate(1.5);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.5s, border-color 0.5s;
+    }
+
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem; font-weight: 900;
+      color: var(--accent);
+      text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent);
+      letter-spacing: 3px; text-transform: uppercase;
+      transition: color 0.5s, text-shadow 0.5s;
+    }
+    .nav-logo em {
+      font-style: normal;
+      color: var(--accent2);
+      text-shadow: 0 0 20px var(--accent2);
+      transition: color 0.5s, text-shadow 0.5s;
+    }
+    .nav-logo small {
+      font-size: 0.5rem; opacity: 0.5; letter-spacing: 4px;
+      color: var(--text-dim); font-family: 'Share Tech Mono', monospace;
+      display: block; margin-top: -2px;
+    }
+
+    .nav-links { display: flex; gap: 1.8rem; list-style: none; align-items: center; }
+    .nav-links a {
+      color: var(--text-dim); text-decoration: none;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      transition: color 0.3s, text-shadow 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+      height: 1px; background: var(--accent); transform: scaleX(0);
+      transition: transform 0.3s ease, background 0.5s;
+    }
+    .nav-links a:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    .nav-discord {
+      background: linear-gradient(135deg, #5865f2, var(--accent2)) !important;
+      color: #fff !important; padding: 0.4rem 1rem; border-radius: 4px;
+      font-weight: 700 !important; text-shadow: none !important;
+    }
+    .nav-discord::after { display: none !important; }
+    .nav-discord:hover { box-shadow: 0 0 20px rgba(88,101,242,0.5); transform: translateY(-1px); }
+
+    /* Settings icon button */
+    .nav-settings-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-dim); width: 34px; height: 34px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s; flex-shrink: 0;
+    }
+    .nav-settings-btn:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px var(--glow); }
+    .nav-settings-btn svg { width: 16px; height: 16px; transition: transform 0.6s ease; }
+    .nav-settings-btn:hover svg { transform: rotate(90deg); }
+
+    /* ============================================================
+       SETTINGS PANEL
+    ============================================================ */
+    .settings-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .settings-overlay.open { opacity: 1; pointer-events: all; }
+
+    .settings-panel {
+      position: fixed; top: 0; right: -420px; width: 400px; height: 100vh;
+      z-index: 400; overflow-y: auto;
+      background: var(--bg2, #080d1a);
+      border-left: 1px solid var(--border);
+      padding: 0;
+      transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s, border-color 0.5s;
+    }
+    .settings-panel.open { right: 0; }
+
+    .settings-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0;
+      background: var(--nav-bg);
+      backdrop-filter: blur(20px);
+      z-index: 10;
+    }
+    .settings-header h2 {
+      font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700;
+      color: var(--accent); letter-spacing: 3px; text-transform: uppercase;
+      text-shadow: 0 0 10px var(--accent);
+    }
+    .settings-close {
+      background: none; border: 1px solid var(--border); color: var(--text-dim);
+      width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; transition: all 0.3s;
+    }
+    .settings-close:hover { border-color: var(--accent); color: var(--accent); }
+
+    .settings-body { padding: 2rem; display: flex; flex-direction: column; gap: 2.5rem; }
+
+    .settings-section-title {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+      color: var(--text-dim); letter-spacing: 4px; text-transform: uppercase;
+      margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.8rem;
+    }
+    .settings-section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* THEME CARDS */
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+    .theme-card {
+      border: 2px solid transparent;
+      border-radius: 10px; padding: 1rem;
+      cursor: pointer; transition: all 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .theme-card:hover { transform: translateY(-2px); }
+    .theme-card.active { border-color: var(--accent) !important; box-shadow: 0 0 20px var(--glow); }
+    .theme-card.active::after {
+      content: '✓'; position: absolute; top: 6px; right: 8px;
+      font-size: 0.7rem; color: var(--accent); font-family: 'Share Tech Mono', monospace;
+      font-weight: 700;
+    }
+
+    .theme-preview {
+      width: 100%; height: 48px; border-radius: 6px; margin-bottom: 0.6rem;
+      position: relative; overflow: hidden;
+    }
+    .theme-preview-inner {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .theme-preview-bar {
+      width: 60%; height: 3px; border-radius: 2px;
+      position: absolute; bottom: 10px; left: 20%;
+    }
+    .theme-preview-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      position: absolute; top: 12px; left: 14px;
+      animation: blink 2s infinite;
+    }
+    .theme-preview-lines {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 12px 12px;
+    }
+
+    /* individual theme previews */
+    .preview-cyber   { background: #050810; border: 1px solid #1a2540; }
+    .preview-nether  { background: #0e0505; border: 1px solid #3d1414; }
+    .preview-emerald { background: #030e06; border: 1px solid #153520; }
+    .preview-void    { background: #08050f; border: 1px solid #281845; }
+    .preview-ice     { background: #060d14; border: 1px solid #1a3348; }
+
+    .theme-name {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.72rem;
+      color: var(--text); letter-spacing: 1px; text-align: center;
+    }
+    .theme-sub {
+      font-size: 0.6rem; color: var(--text-dim); text-align: center; margin-top: 0.2rem;
+      font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;
+    }
+
+    /* EFFECTS TOGGLES */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.8rem 0; border-bottom: 1px solid rgba(26,37,64,0.4);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-label { font-family: 'Rajdhani', sans-serif; font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .toggle-desc { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--text-dim); margin-top: 0.2rem; letter-spacing: 1px; }
+
+    .toggle {
+      position: relative; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; inset: 0; border-radius: 12px;
+      background: var(--border); transition: background 0.3s;
+      border: 1px solid var(--border);
+    }
+    .toggle input:checked ~ .toggle-track { background: var(--accent); border-color: var(--accent); }
+    .toggle-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .toggle input:checked ~ .toggle-track .toggle-thumb { transform: translateX(20px); }
+
+    /* ACCENT INTENSITY */
+    .slider-wrap { margin-top: 0.5rem; }
+    .glow-slider {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 4px; border-radius: 2px;
+      background: var(--border); outline: none; cursor: pointer;
+    }
+    .glow-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 8px var(--accent); cursor: pointer;
+      transition: background 0.5s, box-shadow 0.5s;
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 8rem 2rem 5rem;
+    }
+
+    /* Rotating ring */
+    .hero-ring {
+      position: absolute; width: 700px; height: 700px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      animation: ringRotate 30s linear infinite;
+      pointer-events: none;
+      transition: border-color 0.5s;
+    }
+    .hero-ring::before {
+      content: ''; position: absolute;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 20px var(--accent);
+      top: -6px; left: 50%; transform: translateX(-50%);
+      transition: background 0.5s, box-shadow 0.5s;
+    }
+    .hero-ring-2 {
+      position: absolute; width: 520px; height: 520px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      animation: ringRotate 20s linear infinite reverse;
+      pointer-events: none;
+      transition: border-color 0.5s;
+    }
+    .hero-ring-2::before {
+      content: ''; position: absolute;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent2); box-shadow: 0 0 14px var(--accent2);
+      bottom: -4px; left: 50%; transform: translateX(-50%);
+      transition: background 0.5s, box-shadow 0.5s;
+    }
+    @keyframes ringRotate {
+      from { transform: translate(-50%,-50%) rotate(0deg); }
+      to   { transform: translate(-50%,-50%) rotate(360deg); }
+    }
+
+    .hero-orb {
+      position: absolute; width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      animation: orbPulse 7s ease-in-out infinite;
+      pointer-events: none; transition: background 0.5s;
+    }
+    @keyframes orbPulse {
+      0%,100% { opacity: 0.6; transform: translate(-50%,-50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%,-50%) scale(1.2); }
+    }
+
+    .hero-tag {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.72rem;
+      color: var(--accent); letter-spacing: 5px; text-transform: uppercase;
+      margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.8s ease forwards 0.2s;
+      transition: color 0.5s;
+    }
+
+    .hero-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2.8rem, 8vw, 6.5rem); font-weight: 900; line-height: 1.05;
+      margin-bottom: 0.5rem; opacity: 0; animation: fadeUp 0.8s ease forwards 0.4s;
+      letter-spacing: 4px;
+    }
+    .hero-title .line1 { display: block; color: #fff; text-shadow: 0 0 40px rgba(255,255,255,0.15); }
+    .hero-title .line2 {
+      display: block; font-size: 0.5em; letter-spacing: 10px;
+      background: var(--hero-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 20px var(--accent));
+      transition: filter 0.5s;
+    }
+
+    .hero-sub {
+      font-size: 1rem; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 2.5rem; opacity: 0; animation: fadeUp 0.8s ease forwards 0.6s;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.8rem;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .badge-row {
+      display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 2.5rem; opacity: 0; animation: fadeUp 0.8s ease forwards 0.7s;
+    }
+    .badge {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 3px; padding: 0.3rem 0.85rem; border-radius: 30px; text-transform: uppercase;
+      border: 1px solid; transition: all 0.5s;
+    }
+    .badge-a { background: rgba(34,197,94,0.1);  border-color: rgba(34,197,94,0.3);  color: var(--accent3); }
+    .badge-b { background: rgba(0,0,0,0.2);       border-color: var(--border);         color: var(--accent); }
+    .badge-c { background: rgba(0,0,0,0.2);       border-color: var(--border);         color: var(--accent2); }
+
+    /* IP CARDS */
+    .ip-container {
+      display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 2.5rem; opacity: 0; animation: fadeUp 0.8s ease forwards 0.85s;
+    }
+
+    .ip-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.5rem 2rem; min-width: 220px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s, background 0.5s;
+      cursor: pointer;
+    }
+    .ip-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--bar-gradient); transition: background 0.5s;
+    }
+    .ip-card:hover { border-color: var(--accent); box-shadow: 0 0 30px var(--glow), 0 8px 32px rgba(0,0,0,0.4); transform: translateY(-3px); }
+    .ip-card.bedrock:hover { border-color: var(--accent2); box-shadow: 0 0 30px var(--glow2), 0 8px 32px rgba(0,0,0,0.4); }
+
+    .ip-edition { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; transition: color 0.5s; }
+    .ip-card.bedrock .ip-edition { color: var(--accent2); }
+    .ip-address { font-family: 'Share Tech Mono', monospace; font-size: 1rem; color: #fff; margin-bottom: 0.3rem; }
+    .ip-port { font-size: 0.8rem; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; }
+    .ip-port span { color: var(--gold); transition: color 0.5s; }
+    .copy-hint { font-size: 0.65rem; color: var(--text-dim); margin-top: 0.6rem; letter-spacing: 1px; opacity: 0; transition: opacity 0.3s; }
+    .ip-card:hover .copy-hint { opacity: 1; }
+
+    .copy-toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--accent); color: var(--bg);
+      font-family: 'Share Tech Mono', monospace; font-size: 0.78rem;
+      padding: 0.7rem 1.5rem; border-radius: 4px;
+      z-index: 999; transition: transform 0.4s ease, background 0.5s; pointer-events: none; font-weight: 700;
+    }
+    .copy-toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* STATUS */
+    .status-bar {
+      display: flex; align-items: center; gap: 0.8rem;
+      font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: var(--text-dim);
+      opacity: 0; animation: fadeUp 0.8s ease forwards 1s;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent3); box-shadow: 0 0 10px var(--accent3);
+      animation: blink 2s ease-in-out infinite; transition: background 0.5s, box-shadow 0.5s;
+    }
+    .status-dot.offline { background: #ef4444; box-shadow: 0 0 10px #ef4444; animation: none; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    #player-count { color: var(--accent); transition: color 0.5s; }
+
+    /* ============================================================
+       SECTIONS
+    ============================================================ */
+    section { position: relative; z-index: 1; padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+    .section-header { text-align: center; margin-bottom: 3.5rem; }
+    .section-tag {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.68rem;
+      color: var(--accent); letter-spacing: 5px; text-transform: uppercase;
+      display: block; margin-bottom: 1rem; transition: color 0.5s;
+    }
+    .section-title { font-family: 'Orbitron', monospace; font-size: clamp(1.3rem, 3.5vw, 2rem); color: #fff; letter-spacing: 2px; }
+    .section-line {
+      width: 60px; height: 2px;
+      background: var(--bar-gradient);
+      margin: 1.5rem auto 0; border-radius: 2px; transition: background 0.5s;
+    }
+    .divider { position: relative; z-index: 1; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); transition: background 0.5s; }
+
+    /* PLAYERS GRID */
+    .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 1rem; min-height: 180px; }
+    .player-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.2rem;
+      display: flex; flex-direction: column; align-items: center; gap: 0.8rem;
+      transition: border-color 0.3s, transform 0.3s, background 0.5s;
+    }
+    .player-card:hover { border-color: var(--accent3); transform: translateY(-3px); box-shadow: 0 0 20px rgba(34,197,94,0.1); }
+    .player-avatar { width: 48px; height: 48px; border-radius: 4px; image-rendering: pixelated; background: var(--border); }
+    .player-card-name { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--text); text-align: center; word-break: break-all; }
+    .players-loading, .players-empty { grid-column: 1/-1; text-align: center; padding: 3rem; font-family: 'Share Tech Mono', monospace; color: var(--text-dim); font-size: 0.82rem; letter-spacing: 2px; }
+
+    /* SMP */
+    .smp-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; margin-bottom: 4rem; }
+    .smp-text-block h3 { font-family: 'Orbitron', monospace; font-size: 1.1rem; color: #fff; margin-bottom: 1rem; letter-spacing: 2px; }
+    .smp-text-block p { color: var(--text-dim); font-size: 1rem; line-height: 1.8; }
+
+    .smp-season-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 2rem; position: relative; overflow: hidden;
+      transition: background 0.5s, border-color 0.5s;
+    }
+    .smp-season-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--bar-gradient); transition: background 0.5s; }
+    .season-label { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 3px; color: var(--accent); margin-bottom: 0.8rem; text-transform: uppercase; transition: color 0.5s; }
+    .season-name { font-family: 'Orbitron', monospace; font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 1.5rem; letter-spacing: 2px; }
+    .season-row { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--border); transition: border-color 0.5s; }
+    .season-row:last-child { border-bottom: none; }
+    .season-key { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--text-dim); letter-spacing: 1px; }
+    .season-val { font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: #fff; font-weight: 600; }
+    .season-val.active { color: var(--accent3); }
+    .season-val.soon { color: var(--gold); transition: color 0.5s; }
+
+    /* JOIN STEPS */
+    .join-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1.5rem; }
+    .join-step {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.8rem; position: relative;
+      transition: border-color 0.3s, transform 0.3s, background 0.5s;
+    }
+    .join-step:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 0 30px var(--glow); }
+    .step-num { font-family: 'Orbitron', monospace; font-size: 2.2rem; font-weight: 900; color: rgba(255,255,255,0.05); position: absolute; top: 1rem; right: 1.2rem; line-height: 1; }
+    .step-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+    .step-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem; color: #fff; letter-spacing: 1px; margin-bottom: 0.5rem; text-transform: uppercase; }
+    .step-desc { font-size: 0.92rem; color: var(--text-dim); line-height: 1.6; }
+    .step-code { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--accent); padding: 0.3rem 0.7rem; border-radius: 4px; display: inline-block; margin-top: 0.5rem; transition: color 0.5s, border-color 0.5s; }
+
+    /* RULES */
+    .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 1.5rem; }
+    .rule-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.8rem; position: relative; overflow: hidden;
+      transition: transform 0.3s, background 0.5s, border-color 0.5s;
+    }
+    .rule-card:hover { transform: translateY(-3px); border-color: var(--border); }
+    .rule-number { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; color: rgba(255,255,255,0.04); position: absolute; top: 0.5rem; right: 1rem; line-height: 1; }
+    .rule-icon { font-size: 1.5rem; margin-bottom: 1rem; }
+    .rule-title { font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.05rem; color: #fff; letter-spacing: 1px; margin-bottom: 0.6rem; text-transform: uppercase; }
+    .rule-desc { font-size: 0.93rem; color: var(--text-dim); line-height: 1.6; }
+
+    /* DISCORD + STAFF */
+    .discord-layout { display: grid; grid-template-columns: 1fr 360px; gap: 3rem; align-items: start; }
+    .discord-card {
+      background: linear-gradient(135deg, rgba(88,101,242,0.08), rgba(124,58,237,0.12));
+      border: 1px solid rgba(88,101,242,0.3); border-radius: 16px; padding: 3rem 2.5rem;
+      position: relative; overflow: hidden;
+    }
+    .discord-card::before { content: ''; position: absolute; top: -60%; left: 50%; transform: translateX(-50%); width: 400px; height: 400px; background: radial-gradient(circle, rgba(88,101,242,0.08), transparent 70%); pointer-events: none; }
+    .discord-icon { font-size: 3rem; display: block; margin-bottom: 1.2rem; }
+    .discord-title { font-family: 'Orbitron', monospace; font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 1rem; letter-spacing: 2px; }
+    .discord-text { color: var(--text-dim); font-size: 1rem; margin-bottom: 2rem; line-height: 1.7; }
+    .btn-discord {
+      display: inline-flex; align-items: center; gap: 0.8rem;
+      background: linear-gradient(135deg, #5865f2, #7c3aed); color: #fff;
+      text-decoration: none; padding: 0.9rem 2rem; border-radius: 6px;
+      font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      transition: transform 0.3s, box-shadow 0.3s; position: relative; z-index: 1;
+    }
+    .btn-discord:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(88,101,242,0.4); }
+
+    .discord-widget-wrap { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: border-color 0.5s; }
+
+    /* STAFF */
+    .staff-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem; transition: background 0.5s, border-color 0.5s; }
+    .staff-panel-title { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .staff-member { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid rgba(26,37,64,0.4); transition: border-color 0.5s; }
+    .staff-member:last-of-type { border-bottom: none; }
+    .staff-avatar { width: 42px; height: 42px; border-radius: 4px; object-fit: cover; background: var(--border); flex-shrink: 0; }
+    .staff-info { flex: 1; min-width: 0; }
+    .staff-name { font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: #fff; margin-bottom: 0.2rem; }
+    .staff-role { font-size: 0.68rem; font-family: 'Share Tech Mono', monospace; letter-spacing: 2px; padding: 0.15rem 0.5rem; border-radius: 3px; display: inline-block; }
+    .role-owner  { background: rgba(245,158,11,0.15); color: var(--gold); border: 1px solid rgba(245,158,11,0.3); }
+    .role-admin  { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+    .role-mod    { background: rgba(0,212,255,0.08); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); transition: color 0.5s, border-color 0.5s; }
+    .role-helper { background: rgba(34,197,94,0.1); color: var(--accent3); border: 1px solid rgba(34,197,94,0.25); transition: color 0.5s, border-color 0.5s; }
+    .staff-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+    .staff-dot.on { background: var(--accent3); box-shadow: 0 0 6px var(--accent3); }
+
+    /* REVEAL ANIMATION */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border); padding: 2.5rem 3rem;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+      transition: border-color 0.5s;
+    }
+    .footer-logo { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 900; color: var(--accent); letter-spacing: 3px; transition: color 0.5s; }
+    .footer-text { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--text-dim); letter-spacing: 1px; }
+
+    /* PARTICLE CANVAS */
+    #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    @media (max-width: 900px) {
+      .smp-intro, .discord-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.2rem; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; text-align: center; }
+      .settings-panel { width: 100%; right: -100%; }
+    }
+
+    /* ANIMATED STATS */
+    .stats-section { position: relative; z-index: 1; padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 2rem 1.5rem; text-align: center;
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s, background 0.5s;
+    }
+    .stat-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 0 30px var(--glow); }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--bar-gradient); transition: background 0.5s; }
+    .stat-card::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, var(--glow), transparent 70%); pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+    .stat-card:hover::after { opacity: 1; }
+    .stat-icon { font-size: 2rem; margin-bottom: 0.8rem; display: block; }
+    .stat-number {
+      font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900;
+      color: var(--accent); line-height: 1; margin-bottom: 0.5rem;
+      text-shadow: 0 0 20px var(--glow); transition: color 0.5s, text-shadow 0.5s;
+    }
+    .stat-number .stat-suffix { font-size: 1.4rem; opacity: 0.7; }
+    .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
+
+    /* FAQ */
+    .faq-list { display: flex; flex-direction: column; gap: 1rem; }
+    .faq-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+      transition: border-color 0.3s, background 0.5s;
+    }
+    .faq-item.open { border-color: var(--accent); box-shadow: 0 0 20px var(--glow); }
+    .faq-question {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.3rem 1.8rem; cursor: pointer;
+      font-family: 'Rajdhani', sans-serif; font-weight: 700;
+      font-size: 1.05rem; color: #fff; letter-spacing: 0.5px;
+      user-select: none; gap: 1rem;
+    }
+    .faq-question:hover { color: var(--accent); }
+    .faq-arrow {
+      width: 20px; height: 20px; flex-shrink: 0;
+      border: 1px solid var(--border); border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: var(--text-dim);
+      transition: transform 0.35s, border-color 0.3s, color 0.3s;
+    }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); border-color: var(--accent); color: var(--accent); }
+    .faq-answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.16,1,0.3,1), padding 0.3s;
+      font-size: 0.97rem; color: var(--text-dim); line-height: 1.7;
+    }
+    .faq-item.open .faq-answer { max-height: 300px; }
+    .faq-answer-inner { padding: 0 1.8rem 1.4rem; border-top: 1px solid var(--border); padding-top: 1.1rem; }
+    .faq-answer a { color: var(--accent); text-decoration: none; transition: color 0.3s; }
+    .faq-answer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- SCANLINES -->
+<div class="scanlines" id="scanlines"></div>
+
+<!-- PARTICLE CANVAS -->
+<canvas id="particles"></canvas>
+
+<!-- COPY TOAST -->
+<div class="copy-toast" id="copyToast">✓ COPIED</div>
+
+<!-- ============================================================
+     NAV
+============================================================ -->
+<nav>
+  <div class="nav-logo">Block<em>Bound</em><small>SMP</small></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#join">Join</a></li>
+    <li><a href="#stats">Stats</a></li>
+    <li><a href="#players">Players</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#leaderboard">Leaderboard</a></li>
+    <li><a href="#rules">Rules</a></li>
+    <li><a href="#discord" class="nav-discord">Discord</a></li>
+    <li>
+      <div class="nav-settings-btn" id="settingsBtn" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </div>
+    </li>
+  </ul>
+</nav>
+
+<!-- ============================================================
+     SETTINGS PANEL
+============================================================ -->
+<div class="settings-overlay" id="settingsOverlay"></div>
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-header">
+    <h2>⚙ Settings</h2>
+    <button class="settings-close" id="settingsClose">✕</button>
+  </div>
+  <div class="settings-body">
+
+    <!-- THEMES -->
+    <div>
+      <div class="settings-section-title">Color Theme</div>
+      <div class="theme-grid">
+
+        <div class="theme-card active" data-theme="cyber" style="background:#050810;border-color:#1a2540">
+          <div class="theme-preview preview-cyber">
+            <div class="theme-preview-lines"></div>
+            <div class="theme-preview-dot" style="background:#00d4ff;box-shadow:0 0 8px #00d4ff"></div>
+            <div class="theme-preview-bar" style="background:linear-gradient(90deg,#00d4ff,#7c3aed)"></div>
+          </div>
+          <div class="theme-name" style="color:#c8d6f0">Cyber Blue</div>
+          <div class="theme-sub">Default</div>
+        </div>
+
+        <div class="theme-card" data-theme="nether" style="background:#0e0505;border-color:#3d1414">
+          <div class="theme-preview preview-nether">
+            <div class="theme-preview-lines"></div>
+            <div class="theme-preview-dot" style="background:#ff4d1c;box-shadow:0 0 8px #ff4d1c"></div>
+            <div class="theme-preview-bar" style="background:linear-gradient(90deg,#ff4d1c,#ffd700)"></div>
+          </div>
+          <div class="theme-name" style="color:#f0cfc8">Nether</div>
+          <div class="theme-sub" style="color:#8a5050">Lava & Fire</div>
+        </div>
+
+        <div class="theme-card" data-theme="emerald" style="background:#030e06;border-color:#153520">
+          <div class="theme-preview preview-emerald">
+            <div class="theme-preview-lines"></div>
+            <div class="theme-preview-dot" style="background:#00ff88;box-shadow:0 0 8px #00ff88"></div>
+            <div class="theme-preview-bar" style="background:linear-gradient(90deg,#00ff88,#aaff00)"></div>
+          </div>
+          <div class="theme-name" style="color:#c8f0d4">Emerald</div>
+          <div class="theme-sub" style="color:#3d7050">Deep Forest</div>
+        </div>
+
+        <div class="theme-card" data-theme="void" style="background:#08050f;border-color:#281845">
+          <div class="theme-preview preview-void">
+            <div class="theme-preview-lines"></div>
+            <div class="theme-preview-dot" style="background:#d946ef;box-shadow:0 0 8px #d946ef"></div>
+            <div class="theme-preview-bar" style="background:linear-gradient(90deg,#d946ef,#f0abfc)"></div>
+          </div>
+          <div class="theme-name" style="color:#e8d0f4">The Void</div>
+          <div class="theme-sub" style="color:#6b4a80">Cosmic Purple</div>
+        </div>
+
+        <div class="theme-card" data-theme="ice" style="background:#060d14;border-color:#1a3348">
+          <div class="theme-preview preview-ice">
+            <div class="theme-preview-lines"></div>
+            <div class="theme-preview-dot" style="background:#7fdbff;box-shadow:0 0 8px #7fdbff"></div>
+            <div class="theme-preview-bar" style="background:linear-gradient(90deg,#7fdbff,#bae6fd)"></div>
+          </div>
+          <div class="theme-name" style="color:#daf0ff">Ice Plains</div>
+          <div class="theme-sub" style="color:#4a7a99">Arctic Frost</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- EFFECTS -->
+    <div>
+      <div class="settings-section-title">Visual Effects</div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Floating Particles</div>
+          <div class="toggle-desc">Ambient floating dots</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleParticles" checked />
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Scanlines</div>
+          <div class="toggle-desc">CRT screen overlay effect</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleScanlines" checked />
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Rotating Rings</div>
+          <div class="toggle-desc">Hero section orbit rings</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleRings" checked />
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Scroll Animations</div>
+          <div class="toggle-desc">Fade-in on scroll</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleReveal" checked />
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- GLOW INTENSITY -->
+    <div>
+      <div class="settings-section-title">Glow Intensity</div>
+      <div class="slider-wrap">
+        <input type="range" class="glow-slider" id="glowSlider" min="0" max="100" value="60" />
+        <div style="display:flex;justify-content:space-between;margin-top:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);">
+          <span>None</span><span id="glowVal">60%</span><span>Max</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER NOTE -->
+    <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);letter-spacing:1px;line-height:1.8;padding-top:0.5rem;border-top:1px solid var(--border);">
+      Settings are saved in your browser.<br/>
+      <span style="color:var(--accent)">// blockbound.mc-play.org</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<section class="hero" id="home">
+  <div class="hero-orb"></div>
+  <div class="hero-ring" id="heroRing"></div>
+  <div class="hero-ring-2" id="heroRing2"></div>
+
+  <div class="hero-tag">// survival multiplayer · java &amp; bedrock · cracked friendly</div>
+  <h1 class="hero-title">
+    <span class="line1">BLOCKBOUND</span>
+    <span class="line2">SMP</span>
+  </h1>
+  <p class="hero-sub">// Build · Survive · Dominate · Together //</p>
+
+  <div class="badge-row">
+    <span class="badge badge-a">✓ Cracked Friendly</span>
+    <span class="badge badge-b">☕ Java Edition</span>
+    <span class="badge badge-c">🪨 Bedrock Edition</span>
+    <span class="badge badge-a">🌍 SMP</span>
+  </div>
+
+  <div class="ip-container">
+    <div class="ip-card java" onclick="copyIP('blockbound.mc-play.org','20017')">
+      <div class="ip-edition">☕ Java Edition</div>
+      <div class="ip-address">blockbound.mc-play.org</div>
+      <div class="ip-port">Port: <span>20017</span></div>
+      <div class="copy-hint">↗ click to copy IP:Port</div>
+    </div>
+    <div class="ip-card bedrock" onclick="copyIP('blockbound.mc-play.org','20017')">
+      <div class="ip-edition">🪨 Bedrock Edition</div>
+      <div class="ip-address">blockbound.mc-play.org</div>
+      <div class="ip-port">Port: <span>20017</span></div>
+      <div class="copy-hint">↗ click to copy IP:Port</div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="serverStatus">Checking server...</span>
+    &nbsp;·&nbsp;
+    <span id="player-count">—</span> players online
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header reveal">
+    <span class="section-tag">// what is this</span>
+    <h2 class="section-title">About BlockBound SMP</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="smp-intro">
+    <div class="smp-text-block reveal">
+      <h3>A World Built by the Community</h3>
+      <p>BlockBound SMP is a Survival Multiplayer server where players explore, build, trade, and compete together in a shared persistent world. No pay-to-win, no surprise resets — just pure survival with a growing community across Java and Bedrock.</p>
+      <br/>
+      <p style="font-size:0.93rem;line-height:1.8;">Whether you're a builder, a PvP warrior, a trader, or just here to vibe — there's a place for you. The server is cracked-friendly, meaning you don't need a premium Minecraft account to join.</p>
+    </div>
+    <div class="smp-season-card reveal">
+      <div class="season-label">// current season</div>
+      <div class="season-name">SEASON 1</div>
+      <div class="season-row"><span class="season-key">Status</span><span class="season-val active">● Active</span></div>
+      <div class="season-row"><span class="season-key">Started</span><span class="season-val">2025</span></div>
+      <div class="season-row"><span class="season-key">World Reset</span><span class="season-val soon">TBA</span></div>
+      <div class="season-row"><span class="season-key">Map Size</span><span class="season-val">Unlimited</span></div>
+      <div class="season-row"><span class="season-key">Difficulty</span><span class="season-val">Hard</span></div>
+      <div class="season-row"><span class="season-key">Cross-Play</span><span class="season-val active">✓ Enabled</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW TO JOIN -->
+<section id="join">
+  <div class="section-header reveal">
+    <span class="section-tag">// getting started</span>
+    <h2 class="section-title">How to Join</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="join-steps">
+    <div class="join-step reveal">
+      <div class="step-num">1</div><div class="step-icon">🚀</div>
+      <div class="step-title">Launch Minecraft</div>
+      <div class="step-desc">Open Minecraft Java or Bedrock Edition. Cracked launchers like TLauncher or SKLauncher are fully supported.</div>
+    </div>
+    <div class="join-step reveal">
+      <div class="step-num">2</div><div class="step-icon">🖥️</div>
+      <div class="step-title">Add the Server</div>
+      <div class="step-desc">Go to <strong style="color:#fff">Multiplayer → Add Server</strong> and enter:</div>
+      <div style="margin-top:0.8rem;display:flex;flex-direction:column;gap:0.4rem;">
+        <span class="step-code">blockbound.mc-play.org</span>
+        <span class="step-code">Port: 20017</span>
+      </div>
+    </div>
+    <div class="join-step reveal">
+      <div class="step-num">3</div><div class="step-icon">🎮</div>
+      <div class="step-title">Connect &amp; Play</div>
+      <div class="step-desc">Click Join Server and you're in! Explore spawn, read the rules, and start your survival journey.</div>
+    </div>
+    <div class="join-step reveal">
+      <div class="step-num">4</div><div class="step-icon">💬</div>
+      <div class="step-title">Join Discord</div>
+      <div class="step-desc">Stay connected, get announcements, and meet other players in our community.</div>
+      <a href="https://discord.gg/vsX7Cgb9FF" target="_blank" style="display:inline-block;margin-top:0.8rem;background:linear-gradient(135deg,#5865f2,#7c3aed);color:#fff;text-decoration:none;padding:0.4rem 1rem;border-radius:4px;font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:1px;">discord.gg/vsX7Cgb9FF</a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ANIMATED STATS -->
+<div class="divider"></div>
+<section class="stats-section" id="stats">
+  <div class="section-header reveal">
+    <span class="section-tag">// by the numbers</span>
+    <h2 class="section-title">Server Stats</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card reveal">
+      <span class="stat-icon">👥</span>
+      <div class="stat-number" data-target="dynamic" data-type="players" id="statOnline">—</div>
+      <div class="stat-label">Players Online</div>
+    </div>
+    <div class="stat-card reveal">
+      <span class="stat-icon">🌍</span>
+      <div class="stat-number" data-target="1" id="statSeason">0</div>
+      <div class="stat-label">Current Season</div>
+    </div>
+    <div class="stat-card reveal">
+      <span class="stat-icon">📅</span>
+      <div class="stat-number" data-target="dynamic" data-type="days" id="statDays">0</div>
+      <div class="stat-label">Days Running</div>
+    </div>
+    <div class="stat-card reveal">
+      <span class="stat-icon">⚔️</span>
+      <div class="stat-number" data-target="2" id="statStaff">0</div>
+      <div class="stat-label">Staff Members</div>
+    </div>
+    <div class="stat-card reveal">
+      <span class="stat-icon">🎮</span>
+      <div class="stat-number" data-target="dynamic" data-type="maxplayers" id="statMax">—</div>
+      <div class="stat-label">Max Capacity</div>
+    </div>
+    <div class="stat-card reveal">
+      <span class="stat-icon">🔗</span>
+      <div class="stat-number" style="font-size:1.1rem;padding-top:0.3rem;">Java<br/>&amp; Bedrock</div>
+      <div class="stat-label">Editions Supported</div>
+    </div>
+  </div>
+</section>
+
+<!-- ONLINE PLAYERS -->
+<section id="players">
+  <div class="section-header reveal">
+    <span class="section-tag">// live</span>
+    <h2 class="section-title">Online Players</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="players-grid reveal" id="playersGrid">
+    <div class="players-loading">⟳ LOADING PLAYER DATA...</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- LEADERBOARD -->
+<section id="leaderboard">
+  <div class="section-header reveal">
+    <span class="section-tag">// rankings</span>
+    <h2 class="section-title">Leaderboard</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="reveal" id="leaderboardWrap"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- RULES -->
+<section id="rules">
+  <div class="section-header reveal">
+    <span class="section-tag">// guidelines</span>
+    <h2 class="section-title">Server Rules</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="rules-grid">
+    <div class="rule-card reveal"><div class="rule-number">01</div><div class="rule-icon">🚫</div><div class="rule-title">No Hacking or Cheating</div><div class="rule-desc">Hacked clients, X-ray, auto-clickers, or any form of cheating will result in a permanent ban.</div></div>
+    <div class="rule-card reveal"><div class="rule-number">02</div><div class="rule-icon">🤝</div><div class="rule-title">Respect All Players</div><div class="rule-desc">Harassment, hate speech, racism, or toxic behavior of any kind will not be tolerated.</div></div>
+    <div class="rule-card reveal"><div class="rule-number">03</div><div class="rule-icon">🏗️</div><div class="rule-title">No Griefing</div><div class="rule-desc">Destroying builds, stealing from chests, or ruining other players' experiences is forbidden.</div></div>
+    <div class="rule-card reveal"><div class="rule-number">04</div><div class="rule-icon">📢</div><div class="rule-title">No Spamming</div><div class="rule-desc">Flooding chat, advertising other servers, or repeatedly sending the same messages leads to a ban.</div></div>
+    <div class="rule-card reveal"><div class="rule-number">05</div><div class="rule-icon">🔒</div><div class="rule-title">No Exploiting Bugs</div><div class="rule-desc">If you find an exploit, report it to staff. Abusing it for personal gain is a bannable offense.</div></div>
+    <div class="rule-card reveal"><div class="rule-number">06</div><div class="rule-icon">👮</div><div class="rule-title">Follow Staff Decisions</div><div class="rule-desc">Respect all staff decisions. Appeal via Discord if you disagree — not in-game chat.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FAQ -->
+<div class="divider"></div>
+<section id="faq" style="max-width:1100px;margin:0 auto;padding:6rem 2rem;">
+  <div class="section-header reveal">
+    <span class="section-tag">// common questions</span>
+    <h2 class="section-title">FAQ</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        Do I need a paid Minecraft account to join?
+        <span class="faq-arrow">▼</span>
+      </div>
+      <div class="faq-answer"><div class="faq-answer-inner">No! BlockBound SMP is cracked-friendly. You can join with any launcher, including free ones like TLauncher or SKLauncher. Just add the server IP and port and you're in.</div></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        Can Bedrock and Java players play together?
+        <span class="faq-arrow">▼</span>
+      </div>
+      <div class="faq-answer"><div class="faq-answer-inner">Yes! We support cross-play between Java and Bedrock editions. Both use the same IP <strong style="color:#fff">blockbound.mc-play.org</strong> and the same port <strong style="color:#fff">20017</strong>.</div></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        Will the world ever be reset?
+        <span class="faq-arrow">▼</span>
+      </div>
+      <div class="faq-answer"><div class="faq-answer-inner">World resets only happen between seasons, and we always announce them well in advance on Discord. Season 1 is currently active with no reset planned. Join our <a href="https://discord.gg/vsX7Cgb9FF" target="_blank">Discord</a> to stay updated.</div></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        How do I report a player or appeal a ban?
+        <span class="faq-arrow">▼</span>
+      </div>
+      <div class="faq-answer"><div class="faq-answer-inner">All reports and ban appeals are handled through our <a href="https://discord.gg/vsX7Cgb9FF" target="_blank">Discord server</a>. Do not argue in-game — open a ticket on Discord and staff will review it promptly.</div></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        Is PvP allowed?
+        <span class="faq-arrow">▼</span>
+      </div>
+      <div class="faq-answer"><div class="faq-answer-inner">Yes, PvP is enabled on the server. However, spawn camping, repeatedly targeting the same player, or using PvP to harass others is not allowed and may result in a punishment.</div></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        How do I apply for staff?
+        <span class="faq-arrow">▼</span>
+      </div>
+      <div class="faq-answer"><div class="faq-answer-inner">Staff applications are open on our <a href="https://discord.gg/vsX7Cgb9FF" target="_blank">Discord server</a>. Be an active and positive community member — that's the best way to get noticed!</div></div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-question" onclick="toggleFaq(this)">
+        What Minecraft version should I use?
+        <span class="faq-arrow">▼</span>
+      </div>
+      <div class="faq-answer"><div class="faq-answer-inner">We recommend using the latest stable version of Minecraft for the best experience. Older versions may work but are not guaranteed to be fully compatible.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DISCORD + STAFF -->
+<section id="discord">
+  <div class="section-header reveal">
+    <span class="section-tag">// community</span>
+    <h2 class="section-title">Discord &amp; Staff</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="discord-layout">
+    <div style="display:flex;flex-direction:column;gap:2rem;">
+      <div class="discord-card reveal">
+        <span class="discord-icon">🎮</span>
+        <h2 class="discord-title">Join Our Community</h2>
+        <p class="discord-text">Stay updated with announcements, events, and giveaways. Chat with players, report issues, and get help from staff.</p>
+        <a href="https://discord.gg/vsX7Cgb9FF" target="_blank" class="btn-discord">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.14.105 18.18.12 18.21a19.946 19.946 0 0 0 5.993 2.98.078.078 0 0 0 .084-.026c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-2.981.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+          Join Discord
+        </a>
+      </div>
+      <div class="reveal">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;margin-bottom:0.8rem;">// live discord widget</div>
+        <div class="discord-widget-wrap">
+          <iframe src="https://discord.com/widget?id=1472403686876774452&theme=dark" width="100%" height="320" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="border-radius:12px;display:block;"></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="staff-panel">
+        <div class="staff-panel-title">⚔ Staff Team</div>
+        <div class="staff-member">
+          <img class="staff-avatar" src="https://i.imgur.com/LwCYmcM.png" alt="Dextroop81" style="border-radius:4px;object-fit:cover;" />
+          <div class="staff-info"><div class="staff-name">Dextroop81</div><span class="staff-role role-owner">👑 Owner</span></div>
+          <div class="staff-dot on"></div>
+        </div>
+        <div class="staff-member">
+          <img class="staff-avatar" src="https://i.imgur.com/B9CqM1y.png" alt="vexeon_" style="border-radius:4px;object-fit:cover;" />
+          <div class="staff-info"><div class="staff-name">vexeon_</div><span class="staff-role role-admin">🛡 Admin</span></div>
+          <div class="staff-dot"></div>
+        </div>
+        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text-dim);letter-spacing:1px;line-height:1.9;">
+          Want to join the team?<br/>
+          <a href="https://discord.gg/vsX7Cgb9FF" target="_blank" style="color:var(--accent);text-decoration:none;transition:color 0.5s;">Apply on Discord →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">BLOCKBOUND</div>
+  <div class="footer-text">blockbound.mc-play.org : 20017 &nbsp;|&nbsp; Java &amp; Bedrock &nbsp;|&nbsp; Not affiliated with Mojang Studios</div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+  const SERVER_IP = 'blockbound.mc-play.org';
+
+  /* ---- THEME ---- */
+  const themes = ['cyber','nether','emerald','void','ice'];
+  let currentTheme = localStorage.getItem('bb-theme') || 'cyber';
+  applyTheme(currentTheme);
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    currentTheme = theme;
+    localStorage.setItem('bb-theme', theme);
+    document.querySelectorAll('.theme-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.theme === theme);
+    });
+    // Restart particles with new color
+    setTimeout(initParticles, 100);
+  }
+
+  document.querySelectorAll('.theme-card').forEach(card => {
+    card.addEventListener('click', () => applyTheme(card.dataset.theme));
+  });
+
+  /* ---- SETTINGS PANEL ---- */
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const settingsOverlay = document.getElementById('settingsOverlay');
+  const settingsClose = document.getElementById('settingsClose');
+
+  function openSettings() {
+    settingsPanel.classList.add('open');
+    settingsOverlay.classList.add('open');
+  }
+  function closeSettings() {
+    settingsPanel.classList.remove('open');
+    settingsOverlay.classList.remove('open');
+  }
+  settingsBtn.addEventListener('click', openSettings);
+  settingsClose.addEventListener('click', closeSettings);
+  settingsOverlay.addEventListener('click', closeSettings);
+
+  /* ---- EFFECT TOGGLES ---- */
+  function loadToggles() {
+    const p = localStorage.getItem('bb-particles') !== 'false';
+    const s = localStorage.getItem('bb-scanlines') !== 'false';
+    const r = localStorage.getItem('bb-rings') !== 'false';
+    const v = localStorage.getItem('bb-reveal') !== 'false';
+    document.getElementById('toggleParticles').checked = p;
+    document.getElementById('toggleScanlines').checked = s;
+    document.getElementById('toggleRings').checked = r;
+    document.getElementById('toggleReveal').checked = v;
+    applyEffects(p, s, r, v);
+  }
+
+  function applyEffects(particles, scanlines, rings, reveal) {
+    document.getElementById('particles').style.display = particles ? '' : 'none';
+    document.getElementById('scanlines').style.display = scanlines ? '' : 'none';
+    const ring1 = document.getElementById('heroRing');
+    const ring2 = document.getElementById('heroRing2');
+    if (ring1) ring1.style.display = rings ? '' : 'none';
+    if (ring2) ring2.style.display = rings ? '' : 'none';
+    if (!reveal) {
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+    }
+  }
+
+  ['toggleParticles','toggleScanlines','toggleRings','toggleReveal'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      const p = document.getElementById('toggleParticles').checked;
+      const s = document.getElementById('toggleScanlines').checked;
+      const r = document.getElementById('toggleRings').checked;
+      const v = document.getElementById('toggleReveal').checked;
+      localStorage.setItem('bb-particles', p);
+      localStorage.setItem('bb-scanlines', s);
+      localStorage.setItem('bb-rings', r);
+      localStorage.setItem('bb-reveal', v);
+      applyEffects(p, s, r, v);
+      if (p) initParticles();
+    });
+  });
+
+  /* ---- GLOW SLIDER ---- */
+  const glowSlider = document.getElementById('glowSlider');
+  const glowVal = document.getElementById('glowVal');
+  const savedGlow = localStorage.getItem('bb-glow') || '60';
+  glowSlider.value = savedGlow;
+  glowVal.textContent = savedGlow + '%';
+  applyGlow(savedGlow);
+
+  glowSlider.addEventListener('input', () => {
+    const v = glowSlider.value;
+    glowVal.textContent = v + '%';
+    localStorage.setItem('bb-glow', v);
+    applyGlow(v);
+  });
+
+  function applyGlow(v) {
+    const intensity = v / 100;
+    document.documentElement.style.setProperty('--glow-mult', intensity);
+    // Scale body::after opacity
+    document.documentElement.style.setProperty('--orb-opacity', 0.4 + intensity * 0.6);
+  }
+
+  /* ---- PARTICLES ---- */
+  let animFrame;
+  function initParticles() {
+    cancelAnimationFrame(animFrame);
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Get current accent color from CSS variable
+    const style = getComputedStyle(document.documentElement);
+    const accentRaw = style.getPropertyValue('--accent').trim();
+
+    const particles = Array.from({length: 55}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.4 + 0.05,
+    }));
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const glowMult = parseFloat(localStorage.getItem('bb-glow') || '60') / 100;
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = accentRaw;
+        ctx.globalAlpha = p.alpha * glowMult;
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      // Draw faint connecting lines
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 110) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = accentRaw;
+            ctx.globalAlpha = (1 - dist / 110) * 0.06 * glowMult;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+      animFrame = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  window.addEventListener('resize', () => {
+    const canvas = document.getElementById('particles');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  /* ---- COPY IP ---- */
+  function copyIP(ip, port) {
+    navigator.clipboard.writeText(`${ip}:${port}`).then(() => {
+      const toast = document.getElementById('copyToast');
+      toast.textContent = `✓ COPIED: ${ip}:${port}`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    });
+  }
+
+  /* ---- SERVER STATUS ---- */
+  async function fetchServerStatus() {
+    try {
+      const res = await fetch(`https://api.mcstatus.io/v2/status/java/${SERVER_IP}`);
+      const data = await res.json();
+      const dot = document.getElementById('statusDot');
+      const statusText = document.getElementById('serverStatus');
+      const playerCount = document.getElementById('player-count');
+      if (data.online) {
+        dot.classList.remove('offline');
+        statusText.textContent = 'Server Online';
+        const online = data.players?.online ?? 0;
+        const max = data.players?.max ?? 0;
+        playerCount.textContent = `${online} / ${max}`;
+        renderPlayers(data.players?.list ?? []);
+        runCounters(online, max);
+      } else {
+        dot.classList.add('offline');
+        statusText.textContent = 'Server Offline';
+        playerCount.textContent = '0';
+        renderPlayers([]);
+      }
+    } catch(e) {
+      document.getElementById('serverStatus').textContent = 'Unable to reach server';
+      document.getElementById('statusDot').classList.add('offline');
+      renderPlayers([]);
+    }
+  }
+
+  function renderPlayers(players) {
+    const grid = document.getElementById('playersGrid');
+    if (!players || players.length === 0) {
+      grid.innerHTML = '<div class="players-empty">No players currently online</div>';
+      return;
+    }
+    grid.innerHTML = players.map(p => {
+      const name = p.name_clean || p.name || 'Unknown';
+      const uuid = p.uuid || '';
+      const avatarUrl = uuid
+        ? `https://crafatar.com/avatars/${uuid}?size=48&overlay`
+        : `https://crafatar.com/avatars/MHF_Steve?size=48`;
+      return `<div class="player-card">
+        <img class="player-avatar" src="${avatarUrl}" alt="${name}" onerror="this.src='https://crafatar.com/avatars/MHF_Steve?size=48'" />
+        <div class="player-card-name">${name}</div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ---- LEADERBOARD WIP ---- */
+  function renderLeaderboard() {
+    document.getElementById('leaderboardWrap').innerHTML = `
+      <div style="background:var(--surface);border:1px dashed var(--border);border-radius:12px;padding:4rem 2rem;text-align:center;transition:background 0.5s,border-color 0.5s">
+        <div style="font-size:3rem;margin-bottom:1.5rem">🏗️</div>
+        <div style="font-family:'Orbitron',monospace;font-size:1.2rem;color:#fff;margin-bottom:1rem;letter-spacing:2px">WORK IN PROGRESS</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--text-dim);letter-spacing:2px;line-height:1.8;max-width:380px;margin:0 auto">
+          Leaderboards coming soon.<br/>Stats will be tracked once the server stats system is live.<br/><br/>
+          <span style="color:var(--accent);transition:color 0.5s">// stay tuned</span>
+        </div>
+      </div>`;
+  }
+
+  /* ---- SCROLL REVEAL ---- */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i * 80);
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* ---- INIT ---- */
+  loadToggles();
+  initParticles();
+  fetchServerStatus();
+  setInterval(fetchServerStatus, 60000);
+  renderLeaderboard();
+
+  /* ---- ANIMATED COUNTERS ---- */
+  const SERVER_START = new Date('2026-01-01'); // update this to real launch date
+
+  function animateCounter(el, target, suffix = '') {
+    if (isNaN(target)) return;
+    let start = 0;
+    const duration = 1800;
+    const step = (timestamp) => {
+      if (!start) start = timestamp;
+      const progress = Math.min((timestamp - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 4);
+      el.textContent = Math.floor(ease * target) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target + suffix;
+    };
+    requestAnimationFrame(step);
+  }
+
+  function runCounters(onlinePlayers, maxPlayers) {
+    const days = Math.floor((Date.now() - SERVER_START) / 86400000);
+    const els = {
+      statOnline: onlinePlayers,
+      statSeason: 1,
+      statDays: days,
+      statStaff: 2,
+      statMax: maxPlayers,
+    };
+    Object.entries(els).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && !isNaN(val)) animateCounter(el, val);
+    });
+  }
+
+  /* ---- FAQ TOGGLE ---- */
+  function toggleFaq(questionEl) {
+    const item = questionEl.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+</script>
+</body>
+</html>
